@@ -25,9 +25,6 @@ ItemConstructor.prototype.doSomethingWithItem = function() {
 
 derby.model({
   name: 'myCollection',
-  schema: {}, // Schema - see https://github.com/derbyparty/racer-schema for more details
-  formats: {}, // Formats according to https://github.com/derbyparty/racer-schema
-  validators: {}, // Validators according to https://github.com/derbyparty/racer-schema
   Collection: CollectionConstructor,
   Item: ItemConstructor
 });
@@ -110,9 +107,3 @@ myItem.start('fullName', 'firstName', 'lastName', function (firstName, lastName)
 myItem.get('fullName') // Returns 'Carl-Johan Blomqvist'
 ...
 ```
-
-Ideas and limitations
-=====================
-* There are currently no way to add collection/item specific hooks triggered server side.
-* There still needs some work to make dereferencing properly work.
-* Relations should be added to the schema as a way to automatically subscribe to multiple levels of related collections, and to automatically create references/refLists between items. There's no such functionality right now.
