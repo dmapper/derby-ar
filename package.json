@@ -9,7 +9,7 @@
   "dependencies": {
     "derby-services": "^0.1.1",
     "lodash": "*",
-    "racer-rpc": "^0.1.1",
+    "racer-rpc": "^0.1.1"
   },
   "peerDependencies": {
     "racer": "^0.8.0"

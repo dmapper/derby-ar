@@ -23,10 +23,31 @@ ItemConstructor.prototype.doSomethingWithItem = function() {
   // Your code here
 };
 
+function SubDocFirstConstructor() {}
+
+SubDocFirstConstructor.prototype.doSomethingWithItem = function() {
+  console.log('first');
+};
+
+function SubDocSecondConstructor() {}
+
+SubDocSecondConstructor.prototype.doSomethingWithItem = function() {
+  console.log('second');
+};
+
+function subdocFabric(model){
+  var type = model.get('type');
+  if (type === 'first') return SubDocFirstConstructor;
+  if (type === 'second') return SubDocSecondConstructor;
+}
+
 derby.model({
   name: 'myCollection',
   Collection: CollectionConstructor,
   Item: ItemConstructor
+  SubItems: {
+    "subdoc": subdocFabric
+  }
 });
 ```
 
