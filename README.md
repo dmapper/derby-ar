@@ -35,25 +35,17 @@ SubDocSecondConstructor.prototype.doSomethingWithItem = function() {
   console.log('second');
 };
 
-function subdocFabric(model){
+function subdocFactory(model){
   var type = model.get('type');
   if (type === 'first') return SubDocFirstConstructor;
   if (type === 'second') return SubDocSecondConstructor;
 }
 
-derby.model({
-  name: 'myCollection',
-  Collection: CollectionConstructor,
-  Item: ItemConstructor
-  SubItems: {
-    "subdoc": subdocFabric
-  }
-});
+derby.model('items', "items", CollectionConstructor);
+derby.model('item', "items.*", ItemConstructor);
+derby.model('subdoc', "items.*.subdoc.*", subdocFactory);
 ```
 
-All added schemas are automatically validated server-side and will return errors in the appropriate callbacks - see https://github.com/derbyparty/racer-schema for more details. Formats and validators are there to help the schema validations.
-
-The functionality added to the CollectionConstructor and ItemConstructor can be used to add Model layer (Model as in MVC) such as examplified below:
 
 ```javascript
 ...
