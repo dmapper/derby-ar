@@ -4,119 +4,55 @@ Plugin for helping writing ActiveRecord style/pattern code for Derby
 How to use
 ==========
 After adding the plugin:
-```javascript
-derby.use(require('derby-ar'));
+
+```coffee
+derby.use require 'derby-ar'
 ```
 
-One can add model layer code automatically to the model layer and schemas:
+One can add model layer code automatically to the model layer:
 
-```javascript
-function CollectionConstructor() {}
+```coffee
 
-CollectionConstructor.prototype.doSomethingWithCollection = function() {
-  // Your code here
-};
+{ChildModel} = derby.Model
 
-function ItemConstructor() {}
+class CollectionConstructor extends ChildModel
+    doSomethingWithCollection: ->
 
-ItemConstructor.prototype.doSomethingWithItem = function() {
-  // Your code here
-};
+class ItemConstructor extends ChildModel
+    doSomethingWithItem: ->
 
-function SubDocFirstConstructor() {}
+class Base extends ChildModel
+  method2: ->
+    'method2'
 
-SubDocFirstConstructor.prototype.doSomethingWithItem = function() {
-  console.log('first');
-};
+class SubDocFirstConstructor extends Base
+  method1: ->
+    'first'
 
-function SubDocSecondConstructor() {}
+class SubDocSecondConstructor extends Base
+  method1: ->
+    'second'
 
-SubDocSecondConstructor.prototype.doSomethingWithItem = function() {
-  console.log('second');
-};
-
-function subdocFactory(model){
-  var type = model.get('type');
-  if (type === 'first') return SubDocFirstConstructor;
-  if (type === 'second') return SubDocSecondConstructor;
-}
+class SubdocFactory
+  factory: true
+  constructor: (model, self) ->
+    return switch model.get('type')
+      when 'first' 
+        new SubDocFirstConstructor(self)
+      when 'second' 
+        new SubDocSecondConstructor(self)
 
 derby.model('items', "items", CollectionConstructor);
 derby.model('item', "items.*", ItemConstructor);
-derby.model('subdoc', "items.*.subdoc.*", subdocFactory);
-```
-
-
-```javascript
-...
-var myCollection = model.at('myCollection'); // model needs to be root here, e.g. model.root if used inside Components
-myCollection.subscribe(function () {
-  myCollection.doSomethingWithCollection();
-
-  var myItem = myCollection.at('<id of myItem>');
-
-  myItem.doSomethingWithItem();
-});
-...
-```
-
-Features
-========
-In addition to the base functionality described above, one can call each method as a RPC (Remote Procedure Call), and one can easily switch between ensuring certain methods are only processed server-side. This is useful when one does not trust the client do so certain processing, e.g. when certain processesing is to cumbersome for clients. Any method that exists on any Collection or Item class, can also be triggered in the following manner to process it server-side:
-
-```javascript
-// Trigger myMethod client-side, just like normally
-myCollection.myMethod(myArg1, myArg2, callback);
-
-// Trigger myMethod as a RPC
-myCollection.myMethod.rpc(myArg1, myArg2, callback);
-```
-
-E.g. the only difference in how to call a method as a RPC (and make it process server-side) is to add `.rpc` after the method. The same parameters should be passed. Noteworthy is that a function can in some instances be triggered client side and in some instances triggered as a RPC - this is fully up to the caller.
-
-NOTE! There's one requirement for any method which is possibly called as a RPC. It needs to have a callback function (since RPCs are always asynchronous), and the callback needs to be the last argument passed.
-NOTE 2! This does not protect the methods - they are still passed along to the client.
-
-Derby-services
-==============
-Derby-ar includes derby-services on default, which means you can conveniently add services in a similar fashion to how active records are added. The difference is that services are not tied to a specific collection (behind the scenes, it's just a simple wrapper for conveniently creating JS classes).
-
-```javascript
-function MyService() {}
-
-// The name is used for looking up the proper service when accesing it on the model
-MyService.prototype.name = 'myService';
-
-MyService.prototype.hello = function () {
-  console.log('hello world!');
-};
-
-// Register the service with racer
-racer.service(MyService);
+derby.model 'subdoc', 'items.*.subdoc.*', SubdocFactory
 
 ...
+myCollection = model.at('myCollection')
+myCollection.subscribe ->
+  myCollection.doSomethingWithCollection()
 
-// In your application code
-var $myService = model.service('myService');
-$myService.hello();
-// Output: 'hello world'
-```
+  myItem = myCollection.at('<id of myItem>')
 
-How it works
-============
-Automatically when scoping a model to a collection or item level which has CollectionConstructor and/or ItemConstructor added, the scoped model will inherit the prototype of the Collection/Item-Constructor. Thus, all normal model operations are possible, such as examplified below:
-
-```javascript
-...
-myCollection.get(); // Will return plain Collection object of all items in collection
-
-myItem.set('firstName', 'Carl-Johan'); // Works as normal set
-myItem.set('lastName', 'Blomqvist'); // Works as normal set
-
-myItem.start('fullName', 'firstName', 'lastName', function (firstName, lastName) {
-  return firstName + ' ' + lastName;
-});
-
-myItem.get('fullName') // Returns 'Carl-Johan Blomqvist'
+  myItem.doSomethingWithItem()
 ...
 ```
