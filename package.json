@@ -9,7 +9,7 @@
   "dependencies": {
   },
   "peerDependencies": {
-    "racer": "^0.8.0"
+    "racer": "*"
   },
   "author": "cjblomqvist <carl@cjblomqvist.com>",
   "license": "MIT",
