@@ -1,13 +1,12 @@
 {
   "name": "derby-ar",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Plugin for helping writing ActiveRecord style/pattern code for Derby",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "peerDependencies": {
     "racer": "*"
   },
